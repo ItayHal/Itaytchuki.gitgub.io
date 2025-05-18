@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>Itaytchuki</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Comic Neue', cursive;
+      background: #f0f8ff;
+      text-align: center;
+      padding: 30px;
+    }
+
+    h1, h2 {
+      font-family: 'DynaPuff', cursive;
+    }
+
+img {
+  width: 300px;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  border-radius: 50%;
+  pointer-events: auto;
+}
+
+img:hover {
+  filter: drop-shadow(0px 0px 15px rgba(0, 0, 0, 0.5));
+  transform: scale(1.03);
+}
+
+    .bar {
+      width: 320px;
+      height: 35px;
+      background: #eee;
+      margin: 20px auto;
+      border-radius: 25px;
+      border: 4px solid #000;
+      overflow: hidden;
+      box-shadow: 4px 4px 0px #888;
+      position: relative;
+    }
+
+    .fill {
+      height: 100%;
+      width: 100%;
+      background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.3) 0 10px, transparent 10px 20px);
+      background-size: 30px 30px;
+      background-position: 0 0;
+      animation: stripes 1s linear infinite;
+      border-radius: 25px 0 0 25px;
+      transition: width 0.2s ease-in-out;
+    }
+
+    #hunger .fill { background-color: #ff8c42; }
+    #joy .fill { background-color: #00c3ff; }
+    #ego .fill { background-color: #946ed6; }
+
+    @keyframes stripes {
+      from { background-position: 0 0; }
+      to { background-position: 30px 0; }
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 23px;
+      cursor: pointer;
+      border-radius: 10px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      font-family: 'Comic Neue', cursive;
+    }
+
+    button:hover {
+      background-color: #3e8e41;
+    }
+
+    .emoji-button {
+      font-size: 18px;
+      margin: 8px;
+      padding: 10px 16px;
+      border: none;
+      background: #c2b5d5;
+      border-radius: 12px;
+      box-shadow: 2px 2px 0px #aaa;
+      cursor: pointer;
+      font-family: 'Comic Neue', cursive;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .emoji-button:hover {
+      transform: scale(1.05);
+      background-color: #888192;
+    }
+
+    .examples {
+      margin-top: 15px;
+    }
+
+    .speech-bubble {
+      position: relative;
+      display: inline-block;
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 25px;
+      border: 4px solid black;
+      font-size: 18px;
+      max-width: 320px;
+      font-family: 'Comic Neue', cursive;
+      box-shadow: 4px 4px 0px #000;
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 0;
+      height: 0;
+      border: 15px solid transparent;
+      border-top-color: #fff;
+      border-bottom: none;
+      border-left: none;
+      box-shadow: -2px 2px 0px #000;
+    }
+
+    #bubble-container {
+      height: 80px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Itaytchuki</h1>
+
+  <div id="bubble-container">
+    <div id="speechBubble" class="speech-bubble" style="display: none;"></div>
+  </div>
+
+  <img src="TaychukFace.png" alt="My Face">
+
+  <div id="hunger" class="bar">
+    <div class="fill" style="width: 75%"></div>
+  </div>
+  <div id="joy" class="bar">
+    <div class="fill" style="width: 72%"></div>
+  </div>
+  <div id="ego" class="bar">
+    <div class="fill" style="width: 70%"></div>
+  </div>
+
+  <button onclick="showFoodOptions()">אוכל</button>
+  <button onclick="showFunOptions()">בידור</button>
+  <button onclick="showEgoOptions()">מחמאות</button>
+
+  <div class="examples" id="exampleArea"></div>
+
+  <script>
+    let hungerLevel = 75;
+    let joyLevel = 72;
+    let egoLevel = 70;
+
+    const foodOptions = [
+      { emoji: "🍟", value: 7 },
+      { emoji: "🍔", value: 9 },
+      { emoji: "🍦", value: 6 },
+      { emoji: "🍣", value: 5 },
+      { emoji: "🍕", value: 8 },
+      { emoji: "🍋", value: -7 },
+      { emoji: "🍆", value: -8 }
+    ];
+
+    const funOptions = [
+      { emoji: "📺", value: 8 },
+      { emoji: "🎮", value: 10 },
+      { emoji: "📱", value: 7 },
+      { emoji: "🏀", value: 9 },
+      { emoji: "👨‍🏫", value: -5 },
+      { emoji: "🎢", value: -12 },
+      { emoji: "🪂", value: -15 }
+    ];
+
+    const compliments = [
+      { text: "איזה צופיפופילפופיק", value: 6 },
+      { text: "אין עלייך", value: 4 },
+      { text: "אוהבת אותך 3>", value: 7 },
+      { text: "אתה חמודי!", value: 5 },
+      { text: "איזה ריח טוב יש לך", value: 4 },
+      { text: "אתה הכי מצחיק בעולם", value: 6 },
+      { text: "די עם הקול גרגמל הזה", value: -8 },
+      { text: "אני אקח לך את האף", value: -6 }
+    ];
+
+    function updateBars() {
+      document.querySelector("#hunger .fill").style.width = hungerLevel + "%";
+      document.querySelector("#joy .fill").style.width = joyLevel + "%";
+      document.querySelector("#ego .fill").style.width = egoLevel + "%";
+    }
+
+    function fillBar(type, amount) {
+      if (type === "hunger") {
+        hungerLevel = Math.min(100, hungerLevel + amount);
+      } else if (type === "joy") {
+        joyLevel = Math.min(100, joyLevel + amount);
+      } else if (type === "ego") {
+        egoLevel = Math.min(100, egoLevel + amount);
+      }
+      updateBars();
+    }
+
+    function getRandomUnique(arr, n, exclude = []) {
+      const filtered = arr.filter(x => !exclude.includes(x.text || x.emoji));
+      const shuffled = filtered.sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, n);
+    }
+
+    function showFoodOptions() {
+      const selected = getRandomUnique(foodOptions, 3);
+      document.getElementById("exampleArea").innerHTML = selected.map((item, i) =>
+        `<button class="emoji-button" id="foodBtn${i}" onclick="replaceFood(${i}, ${item.value})">${item.emoji}</button>`
+      ).join("");
+    }
+
+    function replaceFood(index, value) {
+      const buttons = Array.from(document.getElementsByClassName("emoji-button"));
+      const current = buttons.map(btn => btn.innerText);
+      const available = foodOptions.filter(c => !current.includes(c.emoji));
+      if (available.length === 0) return;
+      const newItem = available[Math.floor(Math.random() * available.length)];
+      buttons[index].innerText = newItem.emoji;
+      buttons[index].setAttribute("onclick", `replaceFood(${index}, ${newItem.value})`);
+      fillBar("hunger", value);
+    }
+
+    function showFunOptions() {
+      const selected = getRandomUnique(funOptions, 3);
+      document.getElementById("exampleArea").innerHTML = selected.map((item, i) =>
+        `<button class="emoji-button" id="funBtn${i}" onclick="replaceFun(${i}, ${item.value})">${item.emoji}</button>`
+      ).join("");
+    }
+
+    function replaceFun(index, value) {
+      const buttons = Array.from(document.getElementsByClassName("emoji-button"));
+      const current = buttons.map(btn => btn.innerText);
+      const available = funOptions.filter(c => !current.includes(c.emoji));
+      if (available.length === 0) return;
+      const newItem = available[Math.floor(Math.random() * available.length)];
+      buttons[index].innerText = newItem.emoji;
+      buttons[index].setAttribute("onclick", `replaceFun(${index}, ${newItem.value})`);
+      fillBar("joy", value);
+    }
+
+    function showEgoOptions() {
+      const selected = getRandomUnique(compliments, 3);
+      document.getElementById("exampleArea").innerHTML = selected.map((item, i) =>
+        `<button class="emoji-button" id="egoBtn${i}" onclick="replaceCompliment(${i}, ${item.value})">${item.text}</button>`
+      ).join("");
+    }
+
+    function replaceCompliment(index, value) {
+      const buttons = Array.from(document.getElementsByClassName("emoji-button"));
+      const current = buttons.map(btn => btn.innerText);
+      const available = compliments.filter(c => !current.includes(c.text));
+      if (available.length === 0) return;
+      const newItem = available[Math.floor(Math.random() * available.length)];
+      buttons[index].innerText = newItem.text;
+      buttons[index].setAttribute("onclick", `replaceCompliment(${index}, ${newItem.value})`);
+      fillBar("ego", value);
+    }
+
+    // Bar reduction over time
+    setInterval(() => {
+      hungerLevel = Math.max(0, hungerLevel - 3.5);
+      joyLevel = Math.max(0, joyLevel - 2.0);
+      egoLevel = Math.max(0, egoLevel - 1.3);
+      updateBars();
+
+      // Check if any bar reaches 0
+      if (hungerLevel === 0 || joyLevel === 0 || egoLevel === 0) {
+        showLoserMessage();
+      }
+    }, 1500);
+
+    // Show loser message after 10 seconds when one of the bars is empty
+    function showLoserMessage() {
+setTimeout(() => {
+  const bubble = document.getElementById("speechBubble");
+  bubble.innerText = "איעעעעעעע😭😭";
+  bubble.style.display = "inline-block";
+  setTimeout(() => {
+    bubble.style.display = "none";
+  }, 1000); // Hide after 1 second
+}, 3000); // Show message after 3 seconds
+
+    }
+  </script>
+
+</body>
+</html>
